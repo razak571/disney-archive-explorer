@@ -50,7 +50,7 @@ import { Subject, fromEvent, takeUntil, throttleTime } from 'rxjs';
 
     <!-- Character Grid -->
     @if (!stateService.isLoading() && stateService.filteredCount() > 0) {
-      <div class="grid-wrapper" #scrollContainer>
+      <div class="grid-wrapper" #scrollContainer (scroll)="onScroll()">
         <div class="character-grid">
           @for (character of visibleCharacters; track character._id) {
             <app-character-card [character]="character" />
@@ -248,23 +248,13 @@ export class CharacterListComponent implements OnInit, OnDestroy, AfterViewInit 
   }
 
   ngAfterViewInit(): void {
-    // Listen to scroll events on the grid wrapper
-    if (this.scrollContainer) {
-      fromEvent(this.scrollContainer.nativeElement, 'scroll')
-        .pipe(
-          throttleTime(100), // Don't fire more than once every 100ms (performance)
-          takeUntil(this.destroy$)
-        )
-        .subscribe(() => {
-          this.onScroll();
-        });
-    }
+    // Scroll events are handled via (scroll) binding in the template
   }
 
   /**
    * Called on scroll — check if user is near bottom to load more
    */
-  private onScroll(): void {
+  onScroll(): void {
     const el = this.scrollContainer.nativeElement;
     const scrollPosition = el.scrollTop + el.clientHeight;
     const scrollHeight = el.scrollHeight;
